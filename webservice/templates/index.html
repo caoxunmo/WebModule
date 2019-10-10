@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!--version1.0 2016.3
+v1.1 加入故障信息和恢复旧配置，清空数据库选项 2016.6.28
+v1.2 加入异常报文和故障文件备份的挂载点和逻辑卷信息 2016.8.22
+v1.3 清空数据库和清空var分开 2016.10.25
+v1.4 隐藏清除按键，双击kehui图标显示
+-->
+<html><head>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<!--<meta http-equiv="expires" content="Wed, 26 Feb 1997 08:08:55 GMT">-->
+<meta http-equiv="expires" content="-1">
+<meta name="author" content="lsx">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<!--<meta http-equiv="refresh" content="2">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">-->
+<title>FTR-100录波器信息管理系统
+</title>
+
+<!--<link rel="stylesheet" href="button_style.css">
+<link rel="stylesheet" href="button_font.css">-->
+<link href="bootstrap-combined.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="bootstrap.min.js"></script>
+<!--<script type="text/javascript" src="buttons.js"></script>-->
+<style>
+	/*调整了（主机）和（网段）显示的位置;删除repair*/
+	td {font-style:normal;font-size:90%;font-family:youyuan}
+	textarea {text-align:center;width:100%}
+	th {font-style:normal;font-size:90%;background-color:#DCDCDC;font-family:youyuan}
+	li {font-style:normal;font-family:youyuan;background-color:#DCDCDC}
+	h1 {font-family:stcaiyun;line-height:40px}
+	h3 {font-family:stcaiyun;line-height:15px}
+	.span_text{padding-left:0px;padding-top:10px}
+	.div_net {max-height:45px;font-family:youyuan;border-radius:5px}
+	.img_delete{margin:5px;cursor:pointer}
+	.span_h {font-family:youyuan;font-size:15px;padding-top:40px}
+	div.footer
+	{
+		position:fixed;
+		bottom:10px;
+		width:100%;
+		padding:0.5em;
+		font-family:FZShuTi;
+		font-size:16px;
+		background-color:#B0C4DE;
+	}
+
+.spinner {
+  margin: 100px auto;
+  width: 50px;
+  height: 60px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.spinner > div {
+  background-color: #67CF22;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+</style>
+
+</head>
+<body bgcolor="#FFFFFF" >
+<div style="margin: 0 auto;background:url('bgphoto.jpg');min-height:60px;padding-top:0px" id="h1">
+	<span style="min-height:30px;width:30%;float:left;padding-left:20px;padding-top:10px" ondblclick="bug_dis()"><img src="kehui.png" style="display:inline-block; height:40px; width:80px"></span>
+	<!--<span class="span_h" style="padding-right:30px;font-family:youyuan;font-size:15px;float:right;padding-top:40px"><img src="exit.png" style="display:inline-block; height:15px; width:15px"><a href=# target="_blank"><font color="white">退出</font></a></span>-->
+</div>
+
+<div style="margin: 0 auto;height:300px" class="tabbable" id="tabs-794716" >
+	<div id="bug" style='float:right;margin-top:5px;display:none'>
+		<button class='btn btn-success' type='button' onclick='get_oldfig()'>恢复旧配置</button>
+		<button class='btn btn-success' type='button' onclick='clear_mess()'>清除报文</button>
+		<button class='btn btn-success' type='button' onclick='clear_db()'>清除数据库</button>
+	</div>
+<ul class="nav nav-tabs">
+<li class="active" style="font-family:youyuan"><a href="#panel-650536" data-toggle="tab">网卡信息</a></li>
+<li class="" style="font-family:youyuan"><a href="#panel-237652" data-toggle="tab">挂载点信息</a></li>
+<li class="" style="font-family:youyuan"><a href="#panel-237655" data-toggle="tab">逻辑卷信息</a></li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane active" id="panel-650536" style="margin-left:30px">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tabs-left">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#net0" data-toggle="tab">本地网卡</a>
+                    </li>
+                    <li><a href="#net1" data-toggle="tab">网卡1</a>
+                    </li>
+                    <li><a href="#net2" data-toggle="tab">网卡2</a>
+                    </li>
+                    <li><a href="#net3" data-toggle="tab">网卡3</a>
+                    </li>
+                    <li><a href="#net4" data-toggle="tab">网卡4</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="net0" style="height:100%">
+                    	<form  id="form0"></form>
+                    </div>
+										<div class="tab-pane" id="net1" style="height:100%"><form  id="form1"></form>
+
+                    </div>
+	                  <div class="tab-pane" id="net2" style="height:100%"><form  id="form2"></form>
+
+		                </div>
+                    <div class="tab-pane" id="net3" style="height:100%"><form  id="form3"></form>
+
+		                </div>
+                    <div class="tab-pane" id="net4" style="height:100%"><form  id="form4"></form>
+		                </div>
+                </div>
+                <!-- /tab-content -->
+            </div>
+            <!-- /tabbable -->
+        </div>
+        <!-- /col -->
+    </div>
+    <!-- /row -->
+</div>
+</div>
+<div class="tab-pane" id="panel-237652" >
+	<div class="container-fluid">
+<table class="table table-bordered" >
+<thead>
+<tr>
+<th align="center">挂载项</th>
+<th align="center">挂载点</th>
+<th align="center">状态</th>
+<th align="center">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class="info">
+<td align="center">瞬态记录</td>
+<td align="center" id="dfr_mount_point"></td>
+<td align="center" id="dfr_status"></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">稳态记录</td>
+<td align="center" id="css_mount_point"></td>
+<td align="center" id="css_status"></td>
+<td></td>
+</tr>
+<tr class="info">
+<td align="center">异常报文记录</td>
+<td align="center" id="fpr_mount_point"></td>
+<td align="center" id="fpr_status"></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">故障文件备份</td>
+<td align="center" id="bkup_mount_point"></td>
+<td align="center" id="bkup_status"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+	<div class="tab-pane" id="panel-237655" >
+		<div class="container-fluid">
+<table class="table table-bordered" >
+<thead>
+<tr class="info" >
+<th>逻辑卷名称</th>
+<th>逻辑卷尺寸</th>
+<th>UUID</th>
+<th>状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class="info">
+<td id="lvdfr_n"></td>
+<td id="lvdfr_s"></td>
+<td id="lvdfr_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+<tr>
+<td id="lvcss_n"></td>
+<td id="lvcss_s"></td>
+<td id="lvcss_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+<tr class="info">
+<td id="lvmix_n"></td>
+<td id="lvmix_s"></td>
+<td id="lvmix_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+<tr>
+<td id="lvsmv_n"></td>
+<td id="lvsmv_s"></td>
+<td id="lvsmv_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+<tr class="info">
+<td id="lvfpr_n"></td>
+<td id="lvfpr_s"></td>
+<td id="lvfpr_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+<tr>
+<td id="lvbkup_n"></td>
+<td id="lvbkup_s"></td>
+<td id="lvbkup_uuid"></td>
+<td>OK</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+	</div>
+</div>
+</div>
+
+<div align="left" style="width:100%;padding:0.5em;">
+	<div style="color:red;font-family:stcaiyun"><h4>系统信息</h4></div>
+	<iframe src="why.html" style="width:96%"></iframe>
+</div>
+<div id ="loading" class="spinner" style="visibility:hidden">
+  <div class="rect1"></div>
+  <div class="rect2"></div>
+  <div class="rect3"></div>
+  <div class="rect4"></div>
+  <div class="rect5"></div>
+</div>
+
+<div align="center" style="position:fixed;bottom:5px;left:0;width:100%;padding:0.5em;font-family:FZShuTi;font-size:16px;background-color:#B0C4DE;"><!--Shandong Kehui Power Automation CO.,LTD-->
+	<b>山东科汇电力自动化股份有限公司</b><span style="margin:30px;font-size:14px">designed by lsx</span>
+</div>
+
+</body>
+</html>
